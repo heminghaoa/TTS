@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>YourTTS Synthesis</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+      integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"
+      rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <style>
+    body {
+      padding-top: 54px;
+    }
+
+    @media (min-width: 992px) {
+      body {
+        padding-top: 56px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+
+        <input id="speak-text" placeholder="Type here..." size=45 type="text" name="speak-text">
+        <button id="speak-button" name="speak">Speak</button><br /><br />
+
+        <audio id="synthesize-audio" controls autoplay hidden></audio>
+        <p id="message"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+  const synthesizeTextElem = document.getElementById("speak-text");
+  const messageElem = document.getElementById("message");
+  const synthesizeButton = document.getElementById("speak-button");
+  const audioElem = document.getElementById("synthesize-audio");
+
+  function do_tts(e) {
+    e.preventDefault();
+
+    const synthesizeText = synthesizeTextElem.value;
+    if (synthesizeText) {
+      messageElem.textContent = "Synthesize...";
+      synthesizeButton.disabled = true;
+      audioElem.hidden = true;
+      
+      synthesize(synthesizeText);
+    }
+    return false
+  }
+
+  function synthesize(text) {
+    let bd = {
+      "text": text,
+      "language": "en"
+      /* "speaker-wav": "path or uri to speaker sample voice in wav format" */
+    };
+
+    const data = JSON.stringify(bd);
+    console.log(data);
+
+    const url = "http://10.0.2.15:5002/api/tts";
+    fetch(url, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: data
+    }).then(function (res) {
+      if (!res.ok) throw Error(res.statusText)
+        return res.blob()
+    }).then(function (blob) {
+      messageElem.textContent = "";
+      synthesizeButton.disabled = false;
+      audioElem.src = URL.createObjectURL(blob);
+      audioElem.hidden = false;
+    }).catch(function (err) {
+      messageElem.textContent = 'Error: ' + err.message;
+      synthesizeButton.disabled = false;
+    })
+  }
+
+  synthesizeButton.addEventListener('click', do_tts);
+  synthesizeTextElem.addEventListener('keyup', function (e) {
+    if (e.keyCode == 13) { // enter
+      do_tts(e)
+    }
+  })
+</script>
+
+</body>
+
+</html>
