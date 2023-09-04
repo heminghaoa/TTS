@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -e .[all,dev,notebooks]
 EXPOSE 5002
 
 # 启动命令
-CMD ["python3", "TTS/server/YourTTSService.py"]
+CMD ["python", "TTS/server/YourTTSService.py"]
 
 
 
