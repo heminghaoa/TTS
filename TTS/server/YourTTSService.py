@@ -100,6 +100,17 @@ def enable_cors(response):
             "Origin, Accept, Content-Type, Content-Disposition"
     return response
 
+
+@app.route("/health", methods=["GET"])
+def health_check1():
+    return "OK", 200
+
+@app.route("/", methods=["GET"])
+def health_check2():
+    return "OK", 200
+
+
+
 @app.route("/api/tts", methods=["OPTIONS", "POST"])
 def tts():
 
